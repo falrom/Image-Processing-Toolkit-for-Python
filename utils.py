@@ -42,39 +42,49 @@ def cv_imwrite(output_path, img, channel='BGR', ext='.png'):
     cv2.imencode(ext, img)[1].tofile(output_path)
 
 
-def YUVread(path, size, frame_num=None, start_frame=0, mode='420'):
+def YUVread(path, size, frame_num=None, start_frame=0, mode='420', bits=8, endian='<'):
     """
     Only for 4:2:0 and 4:4:4 for now.
-
     :param path: yuv file path
     :param size: [height, width]
     :param frame_num: The number of frames you want to read, and it shouldn't smaller than the frame number of original
         yuv file. Defult is None, means read from start_frame to the end of file.
     :param start_frame: which frame begin from. Default is 0.
     :param mode: yuv file mode, '420' or '444 planar'
-    :return: byte_type y, u, v with a shape of [frame_num, height, width] of each
+    :param bits: yuv file bit depth, 8 or 12 or 16
+    :param endian: '<' or '>'
+    :return: y, u, v with a shape of [frame_num, height, width] of each
     """
     [height, width] = size
     if mode == '420':
         frame_size = int(height * width / 2 * 3)
     else:
         frame_size = int(height * width * 3)
-    all_y = np.uint8([])
-    all_u = np.uint8([])
-    all_v = np.uint8([])
+
+    pixel_size = 1
+    pixel_type = np.uint8
+    pixel_type_str = 'B'
+    if bits > 8:
+        pixel_size = 2
+        pixel_type = np.uint16
+        pixel_type_str = endian + 'H'
+
+    all_y = pixel_type([])
+    all_u = pixel_type([])
+    all_v = pixel_type([])
     with open(path, 'rb') as file:
-        file.seek(frame_size * start_frame)
+        file.seek(frame_size * pixel_size * start_frame)
         if frame_num is None:
             frame_num = 0
             while True:
                 if mode == '420':
-                    y = np.uint8(list(file.read(height * width)))
-                    u = np.uint8(list(file.read(height * width >> 2)))
-                    v = np.uint8(list(file.read(height * width >> 2)))
+                    y = np.frombuffer(file.read(pixel_size * height * width), dtype=pixel_type_str)
+                    u = np.frombuffer(file.read(pixel_size * height * width >> 2), dtype=pixel_type_str)
+                    v = np.frombuffer(file.read(pixel_size * height * width >> 2), dtype=pixel_type_str)
                 else:
-                    y = np.uint8(list(file.read(height * width)))
-                    u = np.uint8(list(file.read(height * width)))
-                    v = np.uint8(list(file.read(height * width)))
+                    y = np.frombuffer(file.read(pixel_size * height * width), dtype=pixel_type_str)
+                    u = np.frombuffer(file.read(pixel_size * height * width), dtype=pixel_type_str)
+                    v = np.frombuffer(file.read(pixel_size * height * width), dtype=pixel_type_str)
                 if y.shape == (0,):
                     break
                 all_y = np.concatenate([all_y, y])
@@ -84,13 +94,13 @@ def YUVread(path, size, frame_num=None, start_frame=0, mode='420'):
         else:
             for fn in range(frame_num):
                 if mode == '420':
-                    y = np.uint8(list(file.read(height * width)))
-                    u = np.uint8(list(file.read(height * width >> 2)))
-                    v = np.uint8(list(file.read(height * width >> 2)))
+                    y = np.frombuffer(file.read(pixel_size * height * width), dtype=pixel_type_str)
+                    u = np.frombuffer(file.read(pixel_size * height * width >> 2), dtype=pixel_type_str)
+                    v = np.frombuffer(file.read(pixel_size * height * width >> 2), dtype=pixel_type_str)
                 else:
-                    y = np.uint8(list(file.read(height * width)))
-                    u = np.uint8(list(file.read(height * width)))
-                    v = np.uint8(list(file.read(height * width)))
+                    y = np.frombuffer(file.read(pixel_size * height * width), dtype=pixel_type_str)
+                    u = np.frombuffer(file.read(pixel_size * height * width), dtype=pixel_type_str)
+                    v = np.frombuffer(file.read(pixel_size * height * width), dtype=pixel_type_str)
                 if y.shape == (0,):
                     break
                 all_y = np.concatenate([all_y, y])
