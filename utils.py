@@ -45,6 +45,7 @@ def cv_imwrite(output_path, img, channel='BGR', ext='.png'):
 def YUVread(path, size, frame_num=None, start_frame=0, mode='420', bits=8, endian='<'):
     """
     Only for 4:2:0 and 4:4:4 for now.
+    
     :param path: yuv file path
     :param size: [height, width]
     :param frame_num: The number of frames you want to read, and it shouldn't smaller than the frame number of original
@@ -237,6 +238,7 @@ def YUVcut(y, u, v, new_size, new_frame_num=None, start_frame=0, start_point=(0,
 def YUV_change_mode(y, u, v, direction='420to444'):
     """
     y, u, v with a shape of [frame_num, height, width]
+    
     derection: '420to444' or '444to420'
     """
     if direction == '420to444':
