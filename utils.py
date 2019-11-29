@@ -42,7 +42,7 @@ def cv_imwrite(output_path, img, channel='BGR', ext='.png'):
     cv2.imencode(ext, img)[1].tofile(output_path)
 
 
-def YUVread(path, size, frame_num=None, start_frame=0, mode='420', bits=8, endian='<'):
+def YUVread(path, size, frame_num=None, start_frame=0, mode='420', bit=8, endian='<'):
     """
     Only for 4:2:0 and 4:4:4 for now.
     
@@ -52,7 +52,7 @@ def YUVread(path, size, frame_num=None, start_frame=0, mode='420', bits=8, endia
         yuv file. Defult is None, means read from start_frame to the end of file.
     :param start_frame: which frame begin from. Default is 0.
     :param mode: yuv file mode, '420' or '444 planar'
-    :param bits: yuv file bit depth, 8 or 12 or 16
+    :param bit: yuv file bit depth, 8 or 12 or 16
     :param endian: '<' or '>'
     :return: y, u, v with a shape of [frame_num, height, width] of each
     """
@@ -65,7 +65,7 @@ def YUVread(path, size, frame_num=None, start_frame=0, mode='420', bits=8, endia
     pixel_size = 1
     pixel_type = np.uint8
     pixel_type_str = 'B'
-    if bits > 8:
+    if bit > 8:
         pixel_size = 2
         pixel_type = np.uint16
         pixel_type_str = endian + 'H'
